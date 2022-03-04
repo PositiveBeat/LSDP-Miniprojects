@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+# Custom ignores
+2019-03-19 Images for third miniproject/
+.JPG
+.jpg
