@@ -1,17 +1,29 @@
 import cv2 
-import numpy as np   
+import numpy as np
 
-path = "5.jpg"
+
+path = "pump.JPG"
 img = cv2.imread(path)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 pixels = np.reshape(img, (-1, 3))
 
-img_annotated = cv2.imread('5-annotated.jpg')
+img_annotated = cv2.imread("pump-annotated.jpg")
 mask = cv2.inRange(img_annotated, (0, 0, 245), (10, 10, 256))
 
 # Cause Illustartor exported it weird, and I ain't fixing it x)
 height, width, channels = img.shape 
 mask = cv2.resize(mask, (width, height), interpolation= cv2.INTER_LINEAR)
 # Back to the regular scheduled program...
+
+
+# Show mask
+res = cv2.bitwise_and(img,img,mask = mask)
+height, width, channels = res.shape 
+dim = (1000, round(1000 * height/width))
+res = cv2.resize(res, dim, interpolation=cv2.INTER_LINEAR)
+cv2.imshow('Mask', res)
+cv2.waitKey(0)
+
 
 mask_pixels = np.reshape(mask, (-1))
 
