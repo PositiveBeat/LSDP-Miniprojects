@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 
 
 
@@ -37,7 +38,8 @@ def count_pumpkins(img):
 
 
 if __name__ == '__main__':
-    path = "../2019-03-19 Images for third miniproject/"
+    
+    path = os.getcwd() + "/../2019-03-19 Images for third miniproject/"
     filename = path + "EB-02-660_0595_0007.JPG"
 
     img = cv2.imread(filename)
