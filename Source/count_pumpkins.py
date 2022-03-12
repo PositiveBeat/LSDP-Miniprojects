@@ -8,11 +8,11 @@ class CountPumpkins:
         
         # Inversed covariance matrix and average from "colour_variance/get_threshold.py"
         # Used to determine Mahalanobis distance for colour segmentation
-        self.cov_inv = np.array([[ 0.1425055,   0.00316633, -0.00380055],
- [ 0.00316633,  0.00282081,  0.00163333],
- [-0.00380055,  0.00163333,  0.00575833]])
+        self.cov_inv = np.array([[0.1425055, 0.00316633, -0.00380055],
+                                 [0.00316633, 0.00282081, 0.00163333],
+                                 [-0.00380055, 0.00163333, 0.00575833]])
 
-        self.avg = np.array([ 17.49497487, 155.94974874, 247.45477387])
+        self.avg = np.array([17.49497487, 155.94974874, 247.45477387])
         
         self.img = img
         self.img_hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
