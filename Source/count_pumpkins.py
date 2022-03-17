@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 
 
 class CountPumpkins:
-    def __init__(self, img):
+    def __init__(self, img, debug = False):
+        
+        self.debug = debug
         
         # Inversed covariance matrix and average from "colour_variance/get_threshold.py"
         # Used to determine Mahalanobis distance for colour segmentation
@@ -19,29 +21,45 @@ class CountPumpkins:
         self.img_hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
         self.pixels = np.reshape(self.img_hsv, (-1, 3))
         
-        self.detect()
+        self.pumpkin_count = self.detect()
         
         
+
+
     def detect(self):
         
         img_blur = cv2.GaussianBlur(self.img_hsv, (7, 7), 0)
         
         segmented_image = self.mahalanobis(img_blur)
-        cv2.imwrite("output/segmented.jpg", segmented_image)
         
         # Morphological filtering the image
-        kernel_cls = np.ones((11, 11), np.uint8)
-        kernel_opn = np.ones((7, 7), np.uint8)
+        kernel_cls = np.ones((9, 9), np.uint8)
+        kernel_opn = np.ones((5, 5), np.uint8)
         morp_image = cv2.morphologyEx(segmented_image, cv2.MORPH_CLOSE, kernel_cls)
         morp_image = cv2.morphologyEx(morp_image, cv2.MORPH_OPEN, kernel_opn)
-        cv2.imwrite("output/morp.jpg", morp_image)     
 
         contours, hierarchy = cv2.findContours(morp_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         
-        # contours = self.circlepass_filter(contours)
-        contours = self.remove_outliers(contours)
+        # Filter contours
+        image_copy = self.img.copy()
         
-        self.show_output(morp_image, contours)
+        contours = self.remove_outliers(contours)
+        cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
+        contours, clusters, size_avg = self.circlepass_filter(contours)
+        extra_count = self.count_in_cluster(clusters, size_avg, image_copy)   
+        pumpkin_count = len(contours) + extra_count
+        cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        
+        
+        if (self.debug):
+            self.show_output(image_copy, "contours.jpg", contours, (0, 0, 255))
+            cv2.imwrite("output/segmented.jpg", segmented_image)
+            cv2.imwrite("output/morp.jpg", morp_image)     
+            print("Number of detected pumpkins: %d" % pumpkin_count)
+        
+        
+        return pumpkin_count
+
 
 
     def mahalanobis(self, img):
@@ -62,6 +80,8 @@ class CountPumpkins:
         
         good_contours = []
         contour_size = []
+        thres = 4.5
+        
         
         for contour in contours:
             size = np.sqrt(cv2.contourArea(contour))
@@ -72,7 +92,7 @@ class CountPumpkins:
         # plt.show()
         
         for i, size in enumerate(contour_size):
-            if (size > 1):
+            if (size > thres):
                 good_contours.append(contours[i])
 
         return good_contours
@@ -81,25 +101,55 @@ class CountPumpkins:
     def circlepass_filter(self, contours):
         
         circles = []
-        thres = 0.2
+        clusters = []
+        size_avg = 0
+        thres = 0.75
         
         for contour in contours:
             area = cv2.contourArea(contour)
             perimeter = cv2.arcLength(contour, True)
             
-            circle_likeness = (2*np.pi * area) / (perimeter**2 + 0.00001)
+            circle_likeness = (4*np.pi * area) / (perimeter**2 + 0.00001)
             
             if (circle_likeness > thres):
                 circles.append(contour)
+                size_avg += np.sqrt(area)
+            else:
+                clusters.append(contour)
+                
+        size_avg /= len(circles)
         
-        return circles
+        return circles, clusters, size_avg
 
 
-    
-    def show_output(self, closed_image, contours):
+    def count_in_cluster(self, clusters, size_avg, image):
+        
+        pumpkin_cnt = 0
+        
+        for cluster in clusters:
+            area = np.sqrt(cv2.contourArea(cluster))
+            extra_cnt = 0
+            
+            if (area % size_avg >= 1):
+                extra_cnt = round(area / size_avg)
+            else:
+                extra_cnt = 1
+            
+            # Draw number on top of image
+            M = cv2.moments(cluster)
+            cx = int(M['m10'] / M['m00'])
+            cy = int(M['m01'] / M['m00'])
+            cv2.putText(image, str(extra_cnt),(cx,cy), cv2.FONT_HERSHEY_SIMPLEX, .7,(0,0,0),2,cv2.LINE_AA)
+            
+            pumpkin_cnt += extra_cnt
+        
+        return pumpkin_cnt
+
+
+    def show_output(self, image, name, contours, colour):
         
         # Visual display
-        cv2.drawContours(image=self.img, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+        # cv2.drawContours(image=image, contours=contours, contourIdx=-1, color=colour, thickness=1, lineType=cv2.LINE_AA)
         
         # for contour in contours:
         #     M = cv2.moments(contour)
@@ -107,21 +157,21 @@ class CountPumpkins:
         #     if M["m00"] != 0:
         #         cx = int(M['m10'] / M['m00'])
         #         cy = int(M['m01'] / M['m00'])
-        #         cv2.circle(self.img, (cx, cy), 8, (0, 0, 255), 2)
+        #         cv2.circle(image, (cx, cy), 8, (0, 0, 255), 2)
 
-        print("Number of detected pumpkins: %d" % len(contours))
-        cv2.imwrite("output/located-objects.jpg", self.img)
+        cv2.imwrite("output/" + name, image)
 
 
 
 if __name__ == '__main__':
     
-    path = "../2019-03-19 Images for third miniproject/"
-    filename = path + "EB-02-660_0595_0007.JPG"
-    # filename = "../Pumpkin_Field_Ortho.tif"
-    
-    # filename = "input/zoomed_original.jpg"
+    # path = "../2019-03-19 Images for third miniproject/"
+    # filename = path + "EB-02-660_0595_0007.JPG"
+    # filename = "../Pumpkin_Field_Clearer.tif"
+    filename = "input/zoomed_original.jpg"
+
 
     image = cv2.imread(filename)
+    pumpkins = CountPumpkins(image, debug = True)
     
-    pumpkins = CountPumpkins(image)
+    print("Number of detected pumpkins: %d" % pumpkins.pumpkin_count)
