@@ -25,7 +25,6 @@ class CountPumpkins:
         
         
 
-
     def detect(self):
         
         img_blur = cv2.GaussianBlur(self.img_hsv, (7, 7), 0)
@@ -59,7 +58,6 @@ class CountPumpkins:
         
         
         return pumpkin_count
-
 
 
     def mahalanobis(self, img):
@@ -160,7 +158,6 @@ class CountPumpkins:
         #         cv2.circle(image, (cx, cy), 8, (0, 0, 255), 2)
 
         cv2.imwrite("output/" + name, image)
-
 
 
 if __name__ == '__main__':
