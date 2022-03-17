@@ -1,5 +1,7 @@
+from math import floor
 import cv2
 import numpy as np
+import random
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -45,16 +47,21 @@ class CountPumpkins:
         contours = self.remove_outliers(contours)
         cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
         contours, clusters, size_avg = self.circlepass_filter(contours)
+        
+        if (size_avg == 0):
+            return 0
+        
         extra_count = self.count_in_cluster(clusters, size_avg, image_copy)   
         pumpkin_count = len(contours) + extra_count
         cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
         
         
         if (self.debug):
-            self.show_output(image_copy, "contours.jpg", contours, (0, 0, 255))
+            # self.show_output(image_copy, contours, (0, 0, 255), "contours.jpg")
+            self.show_output(image_copy, contours, (0, 0, 255))
             cv2.imwrite("output/segmented.jpg", segmented_image)
             cv2.imwrite("output/morp.jpg", morp_image)     
-            print("Number of detected pumpkins: %d" % pumpkin_count)
+            # print("Number of detected pumpkins: %d" % pumpkin_count)
         
         
         return pumpkin_count
@@ -105,6 +112,7 @@ class CountPumpkins:
         
         for contour in contours:
             area = cv2.contourArea(contour)
+            
             perimeter = cv2.arcLength(contour, True)
             
             circle_likeness = (4*np.pi * area) / (perimeter**2 + 0.00001)
@@ -114,9 +122,10 @@ class CountPumpkins:
                 size_avg += np.sqrt(area)
             else:
                 clusters.append(contour)
-                
-        size_avg /= len(circles)
-        
+
+        if (len(circles) != 0):
+            size_avg /= len(circles)
+            
         return circles, clusters, size_avg
 
 
@@ -128,7 +137,7 @@ class CountPumpkins:
             area = np.sqrt(cv2.contourArea(cluster))
             extra_cnt = 0
             
-            if (area % size_avg >= 1):
+            if (int(area / size_avg) >= 1):
                 extra_cnt = round(area / size_avg)
             else:
                 extra_cnt = 1
@@ -144,7 +153,11 @@ class CountPumpkins:
         return pumpkin_cnt
 
 
-    def show_output(self, image, name, contours, colour):
+    def show_output(self, image, contours, colour, name = "default string" ):
+        
+        if (name == "default string"):
+            name = str(random.randint(1, 10000)) + ".jpg"
+        
         
         # Visual display
         # cv2.drawContours(image=image, contours=contours, contourIdx=-1, color=colour, thickness=1, lineType=cv2.LINE_AA)
