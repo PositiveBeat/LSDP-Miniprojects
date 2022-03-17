@@ -18,6 +18,8 @@ with ras.open(pumpkins_ortho) as Dataset:
 
 pumpkin_count = 0
 
+print(int(Height/7), int(Width / 12))
+
 for i in range(0, Height, int(Height/7)):
     for j in range(0, Width, int(Width / 12)):
         
