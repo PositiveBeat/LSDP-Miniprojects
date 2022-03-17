@@ -132,6 +132,6 @@ dmypy.json
 
 # Custom ignores
 2019-03-19 Images for third miniproject/
-.JPG
-.jpg
-.tif
+*.JPG
+*.jpg
+*.tif
