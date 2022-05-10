@@ -12,7 +12,7 @@ def visualise_flight_path():
 
     # Map showing the drone track during the drone flight
     kml = kmlclass()
-    kml.begin('drone_track.kml', 'Drone Track', 'Drone track during the drone flight', 0.7)
+    kml.begin('output/drone_track.kml', 'Drone Track', 'Drone track during the drone flight', 0.7)
     kml.trksegbegin ('', '', 'red', 'absolute') 
     for row in gps:
         lat = row[0]
@@ -43,13 +43,15 @@ def save_every_50th_frames():
     cap.release()
     cv2.destroyAllWindows()
     
+    print("All done!")
+    
     
     
 if __name__ == '__main__':
     
-    # visualise_flight_path()
+    visualise_flight_path()
     
-    save_every_50th_frames()
+    # save_every_50th_frames()
     
     
     
