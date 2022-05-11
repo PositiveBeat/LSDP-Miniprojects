@@ -1015,11 +1015,9 @@ class VisualSlam:
                 break
 
 
-
-if __name__ == '__main__':
-    vs = VisualSlam(r"input/frames")
-    #vs = VisualSlam(r"input/frames2")
-    #vs = VisualSlam(r"/home/hemi/Nextcloud/Work/01_teaching_courses/2021-02-01_LSDP_Large_scale_drone_perception/materials/experiments/visual_slam/test")
-    vs.set_camera_matrix()
-    vs.run()
+vs = VisualSlam(r"input/frames")
+#vs = VisualSlam(r"input/frames2")
+#vs = VisualSlam(r"/home/hemi/Nextcloud/Work/01_teaching_courses/2021-02-01_LSDP_Large_scale_drone_perception/materials/experiments/visual_slam/test")
+vs.set_camera_matrix()
+vs.run()
 
