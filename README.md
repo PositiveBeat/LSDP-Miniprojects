@@ -1,4 +1,5 @@
 # LSDP-Miniprojects
+Large Scale Drone Perception (F22) - University of Southern Denmark
 
 Dataset for miniproject 1:
 Add folder with images to root of repo.
