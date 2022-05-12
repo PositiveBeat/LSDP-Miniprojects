@@ -49,9 +49,9 @@ def save_every_50th_frames():
     
 if __name__ == '__main__':
     
-    visualise_flight_path()
+    # visualise_flight_path()
     
-    # save_every_50th_frames()
+    save_every_50th_frames()
     
     
     
