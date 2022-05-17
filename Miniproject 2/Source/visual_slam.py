@@ -917,8 +917,8 @@ class VisualSlam:
         self.map.remove_observations_with_reprojection_errors_above_threshold(1)
         #self.unfreeze_cameras()
         #self.map.optimize_map()
-                
-        
+
+
     def freeze_nonlast_cameras(self):
         for idx, camera in enumerate(self.map.cameras):
             self.map.cameras[idx].fixed = True
