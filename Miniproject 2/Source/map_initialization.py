@@ -134,14 +134,17 @@ if __name__ == '__main__':
     gray_image1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     gray_image2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     
-    essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
-    
+    # essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
     # get_epipolar_error(gray_image1, gray_image2, essentialMatrix, pts1, pts2)
-
-    frame1 = gray_image1
-    frame2 = gray_image2
-    # vs.current_image_pair = vs.ImagePair(frame1, frame2, vs.bf, vs.camera_matrix)
-    # vs.current_image_pair.match_features()
-    # essential_matches = vs.current_image_pair.determine_essential_matrix(vs.current_image_pair.filtered_matches)
-    # vs.current_image_pair.estimate_camera_movement(essential_matches)
+    
+    
+    # Calculates relative movement
+    bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+    frameGen = vs.FrameGenerator(cv2.SIFT_create())
+    frame1 = frameGen.make_frame(gray_image1)
+    frame2 = frameGen.make_frame(gray_image2)
+    vs.current_image_pair = vs.ImagePair(frame1, frame2, bf, get_camera_matrix())
+    vs.current_image_pair.match_features()
+    essential_matches = vs.current_image_pair.determine_essential_matrix(vs.current_image_pair.filtered_matches)
+    vs.current_image_pair.estimate_camera_movement(essential_matches)
 
