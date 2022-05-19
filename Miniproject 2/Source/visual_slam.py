@@ -899,6 +899,8 @@ class VisualSlam:
                         current_frame.id, 
                         fixed = False)
                 camera = self.map.add_camera(camera)
+                
+                print('R and t: ', R, tvec)
 
                 self.add_information_to_map()
             else:
@@ -1016,9 +1018,7 @@ class VisualSlam:
 
 if __name__ == '__main__':
 
-    vs = VisualSlam(r"input/frames")
-    #vs = VisualSlam(r"input/frames2")
-    #vs = VisualSlam(r"/home/hemi/Nextcloud/Work/01_teaching_courses/2021-02-01_LSDP_Large_scale_drone_perception/materials/experiments/visual_slam/test")
+    vs = VisualSlam(r"input/frames3")
     vs.set_camera_matrix()
     vs.run()
 
