@@ -900,7 +900,10 @@ class VisualSlam:
                         fixed = False)
                 camera = self.map.add_camera(camera)
                 
-                print('R and t: ', R, tvec)
+                print('R and t: ')
+                print(R)
+                print(tvec)
+                print('\n')
 
                 self.add_information_to_map()
             else:
