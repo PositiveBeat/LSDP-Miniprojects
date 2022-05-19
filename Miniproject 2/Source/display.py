@@ -1,5 +1,5 @@
 from multiprocessing import Process, Queue
-import Pangolin
+import pangolin
 import OpenGL.GL as gl
 import numpy as np
 
@@ -20,22 +20,22 @@ class Display3D(object):
       self.viewer_refresh(q)
 
   def viewer_init(self, w, h):
-    Pangolin.CreateWindowAndBind('Map Viewer', w, h)
+    pangolin.CreateWindowAndBind('Map Viewer', w, h)
     gl.glEnable(gl.GL_DEPTH_TEST)
 
-    self.scam = Pangolin.OpenGlRenderState(
-      Pangolin.ProjectionMatrix(w, h, 420, 420, w//2, h//2, 0.2, 10000),
-      Pangolin.ModelViewLookAt(0, -1, -2,
+    self.scam = pangolin.OpenGlRenderState(
+      pangolin.ProjectionMatrix(w, h, 420, 420, w//2, h//2, 0.2, 10000),
+      pangolin.ModelViewLookAt(0, -1, -2,
                                0, 0, 10,
                                0, -1, 0))
-    self.handler = Pangolin.Handler3D(self.scam)
+    self.handler = pangolin.Handler3D(self.scam)
 
     # Create Interactive View in window
-    self.dcam = Pangolin.CreateDisplay()
+    self.dcam = pangolin.CreateDisplay()
     self.dcam.SetBounds(0.0, 1.0, 0.0, 1.0, w/h)
     self.dcam.SetHandler(self.handler)
-    # hack to avoid small Pangolin, no idea why it's *2
-    self.dcam.Resize(Pangolin.Viewport(0,0,w*2,h*2))
+    # hack to avoid small pangolin, no idea why it's *2
+    self.dcam.Resize(pangolin.Viewport(0,0,w*2,h*2))
     self.dcam.Activate()
 
 
@@ -49,23 +49,23 @@ class Display3D(object):
     gl.glClearColor(0.0, 0.0, 0.0, 1.0)
     self.dcam.Activate(self.scam)
 
-    #Pangolin.glDrawColouredCube(1)
+    #pangolin.glDrawColouredCube(1)
     # Draw feature points with red dots.
     gl.glPointSize(4)
     gl.glColor3f(1.0, 0.0, 0.0)
     if self.points_to_draw is not None:
-        Pangolin.DrawPoints(self.points_to_draw, self.point_colors)
+        pangolin.DrawPoints(self.points_to_draw, self.point_colors)
 
     # Test of drawing manual points.
     #gl.glColor3f(1.0, 1.0, 1.0)
-    #Pangolin.DrawPoints(np.array([[0, 0, 0], [10, 0, 0], [0, 20, 0], [0, 0, 40]]))
+    #pangolin.DrawPoints(np.array([[0, 0, 0], [10, 0, 0], [0, 20, 0], [0, 0, 40]]))
 
     gl.glColor3f(1.0, 1.0, 1.0)
     if self.poses_to_draw is not None:
         for pose in self.poses_to_draw:
-            Pangolin.DrawCamera(pose, 1, 0.5, 0.8)
+            pangolin.DrawCamera(pose, 1, 0.5, 0.8)
 
-    Pangolin.FinishFrame()
+    pangolin.FinishFrame()
     return 
 
 

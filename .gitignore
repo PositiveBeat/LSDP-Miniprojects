@@ -134,3 +134,5 @@ dmypy.json
 2019-03-19 Images for third miniproject/
 *.tif
 *.MOV
+g20
+pangolin
