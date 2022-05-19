@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import visual_slam as vs
 
@@ -136,12 +136,12 @@ if __name__ == '__main__':
     
     essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
     
-    get_epipolar_error(gray_image1, gray_image2, essentialMatrix, pts1, pts2)
+    # get_epipolar_error(gray_image1, gray_image2, essentialMatrix, pts1, pts2)
 
     frame1 = gray_image1
     frame2 = gray_image2
-    vs.current_image_pair = vs.ImagePair(frame1, frame2, vs.bf, vs.camera_matrix)
-    vs.current_image_pair.match_features()
-    essential_matches = vs.current_image_pair.determine_essential_matrix(vs.current_image_pair.filtered_matches)
-    vs.current_image_pair.estimate_camera_movement(essential_matches)
+    # vs.current_image_pair = vs.ImagePair(frame1, frame2, vs.bf, vs.camera_matrix)
+    # vs.current_image_pair.match_features()
+    # essential_matches = vs.current_image_pair.determine_essential_matrix(vs.current_image_pair.filtered_matches)
+    # vs.current_image_pair.estimate_camera_movement(essential_matches)
 
