@@ -94,44 +94,57 @@ def cal_dst_lin2pt(pts, lines):
     return distances
 
 
+def get_epipolar_error():
+    
+
+    essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
+
+    # Find epilines corresponding to points in right image (second image) and
+    # drawing its lines on left image
+    lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1, 1, 2), 2, essentialMatrix)
+    lines1 = lines1.reshape(-1, 3)
+    img5, img6 = drawlines(gray_image1, gray_image2, lines1, pts1, pts2)
+    # Find epilines corresponding to points in left image (first image) and
+    # drawing its lines on right image
+    lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1, 1, 2), 1, essentialMatrix)
+    lines2 = lines2.reshape(-1, 3)
+    img3, img4 = drawlines(gray_image2, gray_image1, lines2, pts2, pts1)
 
 
-img1 = cv2.imread("input/frames/frame0.jpg")
-img2 = cv2.imread("input/frames/frame50.jpg")
-
-gray_image1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-gray_image2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+            
+    dst1 = cal_dst_lin2pt(pts1, lines1)
+    dst2 = cal_dst_lin2pt(pts2, lines2)
 
 
-essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
+    plt.subplot(121), plt.imshow(img5)
+    plt.subplot(122), plt.imshow(img3)
+    plt.show()
 
-# Find epilines corresponding to points in right image (second image) and
-# drawing its lines on left image
-lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1, 1, 2), 2, essentialMatrix)
-lines1 = lines1.reshape(-1, 3)
-img5, img6 = drawlines(gray_image1, gray_image2, lines1, pts1, pts2)
-# Find epilines corresponding to points in left image (first image) and
-# drawing its lines on right image
-lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1, 1, 2), 1, essentialMatrix)
-lines2 = lines2.reshape(-1, 3)
-img3, img4 = drawlines(gray_image2, gray_image1, lines2, pts2, pts1)
+    print('mean: ', np.mean(dst1))
+    print('std deviation: ', np.std(dst1))
+    plt.hist(dst1, bins=200)
+    plt.show()
 
-
-        
-dst1 = cal_dst_lin2pt(pts1, lines1)
-dst2 = cal_dst_lin2pt(pts2, lines2)
+    print('mean: ', np.mean(dst2))
+    print('std deviation: ', np.std(dst2))
+    plt.hist(dst2, bins=200)
+    plt.show()
 
 
-plt.subplot(121), plt.imshow(img5)
-plt.subplot(122), plt.imshow(img3)
-plt.show()
+if __name__ == '__main__':
+    
+    img1 = cv2.imread("input/frames/frame0.jpg")
+    img2 = cv2.imread("input/frames/frame50.jpg")
 
-print('mean: ', np.mean(dst1))
-print('std deviation: ', np.std(dst1))
-plt.hist(dst1, bins=200)
-plt.show()
+    gray_image1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    gray_image2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    
+    get_epipolar_error()
 
-print('mean: ', np.mean(dst2))
-print('std deviation: ', np.std(dst2))
-plt.hist(dst2, bins=200)
-plt.show()
+    frame1 = self.list_of_frames[-2]
+    frame2 = self.list_of_frames[-1]
+    self.current_image_pair = ImagePair(frame1, frame2, self.bf, self.camera_matrix)
+    self.current_image_pair.match_features()
+    essential_matches = self.current_image_pair.determine_essential_matrix(self.current_image_pair.filtered_matches)
+    self.current_image_pair.estimate_camera_movement(essential_matches)
+
