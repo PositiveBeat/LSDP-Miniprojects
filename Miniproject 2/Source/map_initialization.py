@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# from visual_slam import *
+import visual_slam as vs
 
 
 def get_camera_matrix():
@@ -94,11 +94,8 @@ def cal_dst_lin2pt(pts, lines):
     return distances
 
 
-def get_epipolar_error():
+def get_epipolar_error(gray_image1, gray_image2, essentialMatrix, pts1, pts2):
     
-
-    essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
-
     # Find epilines corresponding to points in right image (second image) and
     # drawing its lines on left image
     lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1, 1, 2), 2, essentialMatrix)
@@ -109,8 +106,6 @@ def get_epipolar_error():
     lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1, 1, 2), 1, essentialMatrix)
     lines2 = lines2.reshape(-1, 3)
     img3, img4 = drawlines(gray_image2, gray_image1, lines2, pts2, pts1)
-
-
             
     dst1 = cal_dst_lin2pt(pts1, lines1)
     dst2 = cal_dst_lin2pt(pts2, lines2)
@@ -139,12 +134,14 @@ if __name__ == '__main__':
     gray_image1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     gray_image2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     
-    get_epipolar_error()
+    essentialMatrix, pts1, pts2 = get_sift(gray_image1, gray_image2)
+    
+    get_epipolar_error(gray_image1, gray_image2, essentialMatrix, pts1, pts2)
 
-    frame1 = self.list_of_frames[-2]
-    frame2 = self.list_of_frames[-1]
-    self.current_image_pair = ImagePair(frame1, frame2, self.bf, self.camera_matrix)
-    self.current_image_pair.match_features()
-    essential_matches = self.current_image_pair.determine_essential_matrix(self.current_image_pair.filtered_matches)
-    self.current_image_pair.estimate_camera_movement(essential_matches)
+    frame1 = gray_image1
+    frame2 = gray_image2
+    vs.current_image_pair = vs.ImagePair(frame1, frame2, vs.bf, vs.camera_matrix)
+    vs.current_image_pair.match_features()
+    essential_matches = vs.current_image_pair.determine_essential_matrix(vs.current_image_pair.filtered_matches)
+    vs.current_image_pair.estimate_camera_movement(essential_matches)
 
